@@ -34,10 +34,12 @@ class NavDrawer extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: Colors.greenAccent,
-            // image: DecorationImage(
-            //     fit: BoxFit.fill,
-            //     image: AssetImage('assets/images/cover.jpg'))
           ),
+        ),
+        ListTile(
+          leading: Icon(Icons.wc),
+          title: Text('Favoris'),
+          onTap: () => {Navigator.of(context).pop},
         )
       ]),
     );
