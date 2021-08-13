@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget {
           '/generator': (context) => RandomWords(),
           '/favorite': (context) => Favorite(),
           '/addFavorite': (context) => FormFavorite(),
+          '/favoriteGrid': (context) => FavoriteGrid(),
         });
   }
 }
@@ -30,7 +31,7 @@ class Favorite extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tiles = _RandomWordsState._saved.map(
-          (String word) {
+      (String word) {
         return ListTile(
           title: Text(
             word,
@@ -49,6 +50,31 @@ class Favorite extends StatelessWidget {
         title: Text('Favoris'),
       ),
       body: ListView(children: divided),
+    );
+  }
+}
+
+class FavoriteGrid extends StatelessWidget {
+  final _biggerFont = const TextStyle(fontSize: 18.0);
+
+  @override
+  Widget build(BuildContext context) {
+    final tiles = _RandomWordsState._saved.map(
+      (String word) {
+        return Center(
+          child: Text(
+            word,
+            style: _biggerFont,
+          ),
+        );
+      },
+    );
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Favoris'),
+      ),
+      body: GridView.count(crossAxisCount: 2, children: tiles.toList()),
     );
   }
 }
@@ -80,8 +106,7 @@ class _RandomWordsState extends State<RandomWords> {
         padding: const EdgeInsets.all(16.0),
         itemBuilder: (context, index) {
           return _buildRow(items[index]);
-        }
-    );
+        });
   }
 
   Widget _buildRow(String word) {
@@ -114,30 +139,35 @@ class NavDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
         child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-                child: Text(
-                  'Menu',
-                  style: TextStyle(color: Colors.white, fontSize: 25),
-                )),
-            ListTile(
-              leading: Icon(Icons.input),
-              title: Text('Generator'),
-              onTap: () => {Navigator.pushNamed(context, '/generator')},
-            ),
-            ListTile(
-              leading: Icon(Icons.input),
-              title: Text('Favoris'),
-              onTap: () => {Navigator.pushNamed(context, '/favorite')},
-            ),
-            ListTile(
-              leading: Icon(Icons.input),
-              title: Text('Form'),
-              onTap: () => {Navigator.pushNamed(context, '/addFavorite')},
-            ),
-          ],
-        ));
+      padding: EdgeInsets.zero,
+      children: <Widget>[
+        DrawerHeader(
+            child: Text(
+          'Menu',
+          style: TextStyle(color: Colors.white, fontSize: 25),
+        )),
+        ListTile(
+          leading: Icon(Icons.input),
+          title: Text('Generator'),
+          onTap: () => {Navigator.pushNamed(context, '/generator')},
+        ),
+        ListTile(
+          leading: Icon(Icons.input),
+          title: Text('Favoris'),
+          onTap: () => {Navigator.pushNamed(context, '/favorite')},
+        ),
+        ListTile(
+          leading: Icon(Icons.input),
+          title: Text('Form'),
+          onTap: () => {Navigator.pushNamed(context, '/addFavorite')},
+        ),
+        ListTile(
+          leading: Icon(Icons.input),
+          title: Text('Favoris grille'),
+          onTap: () => {Navigator.pushNamed(context, '/favoriteGrid')},
+        ),
+      ],
+    ));
   }
 }
 
@@ -177,9 +207,7 @@ class _FormFavoriteState extends State<FormFavorite> {
           TextFormField(
             controller: myController,
             decoration: InputDecoration(
-                border: UnderlineInputBorder(),
-                labelText: 'Enter a name'
-            ),
+                border: UnderlineInputBorder(), labelText: 'Enter a name'),
             // The validator receives the text that the user has entered.
             validator: (value) {
               if (value == null || value.isEmpty) {
