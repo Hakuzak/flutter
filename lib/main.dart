@@ -19,9 +19,10 @@ class MyApp extends StatelessWidget {
         routes: {
           '/': (context) => FirstScreen(),
           '/second': (context) => SecondScreen(),
-          '/generator': (context) => RandomWords()
-        }
-    );
+          '/generator': (context) => RandomWords(),
+          '/favorite': (context) => Favorite(),
+          '/addFavorite': (context) => Favorite(),
+        });
   }
 }
 
@@ -64,41 +65,36 @@ class SecondScreen extends StatelessWidget {
   }
 }
 
-
 class Favorite extends StatelessWidget {
   final _biggerFont = const TextStyle(fontSize: 18.0);
 
-
   @override
   Widget build(BuildContext context) {
-    Navigator.of(context).push(
-        MaterialPageRoute<void>(
-            builder: (BuildContext context) {
-              final tiles = _saved.map(
-                    (WordPair pair) {
-                  return ListTile(
-                    title: Text(
-                      pair.asPascalCase,
-                      style: _biggerFont,
-                    ),
-                  );
-                },
-              );
-              final divided = ListTile.divideTiles(
-                context: context,
-                tiles: tiles,
-              ).toList();
 
-              return Scaffold(
-                appBar: AppBar(
-                  title: Text('Favoris'),
-                ),
-                body: Text('toto'),
-              );
-            }));
+    final tiles = _RandomWordsState._saved.map(
+          (WordPair pair) {
+        return ListTile(
+          title: Text(
+            pair.asPascalCase,
+            style: _biggerFont,
+          ),
+        );
+      },
+    );
+    final divided = ListTile.divideTiles(
+      context: context,
+      tiles: tiles,
+    ).toList();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Favoris'),
+      ),
+      body: ListView(children: divided),
+    );
+
   }
 }
-
 
 class RandomWords extends StatefulWidget {
   const RandomWords({Key? key}) : super(key: key);
@@ -108,16 +104,15 @@ class RandomWords extends StatefulWidget {
 }
 
 class _RandomWordsState extends State<RandomWords> {
-  final _suggestions = <WordPair>[];
-  final _saved = <WordPair>[];
+  static List<WordPair> _suggestions = <WordPair>[];
+  static List<WordPair> _saved = <WordPair>[];
   final _biggerFont = const TextStyle(fontSize: 18.0);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: NavDrawer(),
-      appBar: AppBar(title: const Text('Startup Name Generator'), actions: [
-      ]),
+      appBar: AppBar(title: const Text('Startup Name Generator'), actions: []),
       body: _buildSuggestions(),
     );
   }
@@ -158,10 +153,7 @@ class _RandomWordsState extends State<RandomWords> {
           });
         });
   }
-
-
 }
-
 
 class NavDrawer extends StatelessWidget {
   const NavDrawer({Key? key}) : super(key: key);
@@ -170,35 +162,35 @@ class NavDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
         child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-                child: Text(
-                  'Menu',
-                  style: TextStyle(color: Colors.white, fontSize: 25),
-                )
-            ),
-            ListTile(
-              leading: Icon(Icons.input),
-              title: Text('Home'),
-              onTap: () => {Navigator.pushNamed(context, '/')}
-              ,
-            ),
-            ListTile(
-              leading: Icon(Icons.input),
-              title: Text('Second'),
-              onTap: () => {Navigator.pushNamed(context, '/second')}
-              ,
-            ),
-            ListTile(
-              leading: Icon(Icons.input),
-              title: Text('Generator'),
-              onTap: () => {Navigator.pushNamed(context, '/generator')}
-              ,
-            ),
-          ],
+      padding: EdgeInsets.zero,
+      children: <Widget>[
+        DrawerHeader(
+            child: Text(
+          'Menu',
+          style: TextStyle(color: Colors.white, fontSize: 25),
+        )),
+        ListTile(
+          leading: Icon(Icons.input),
+          title: Text('Home'),
+          onTap: () => {Navigator.pushNamed(context, '/')},
+        ),
+        ListTile(
+          leading: Icon(Icons.input),
+          title: Text('Second'),
+          onTap: () => {Navigator.pushNamed(context, '/second')},
+        ),
+        ListTile(
+          leading: Icon(Icons.input),
+          title: Text('Generator'),
+          onTap: () => {Navigator.pushNamed(context, '/generator')},
+        ),
+        ListTile(
+          leading: Icon(Icons.input),
+          title: Text('Favoris'),
+          onTap: () => {Navigator.pushNamed(context, '/favorite')},
         )
-    );
+      ],
+    ));
   }
 }
 
