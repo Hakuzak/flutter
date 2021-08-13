@@ -15,53 +15,12 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primaryColor: Colors.greenAccent,
         ),
-        initialRoute: '/',
+        initialRoute: '/generator',
         routes: {
-          '/': (context) => FirstScreen(),
-          '/second': (context) => SecondScreen(),
           '/generator': (context) => RandomWords(),
           '/favorite': (context) => Favorite(),
-          '/addFavorite': (context) => Favorite(),
+          '/addFavorite': (context) => FormFavorite(),
         });
-  }
-}
-
-class FirstScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: NavDrawer(),
-      appBar: AppBar(
-        title: Text('First Screen'),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.pushNamed(context, '/second');
-          },
-          child: Text('Launch screen'),
-        ),
-      ),
-    );
-  }
-}
-
-class SecondScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Second Screen'),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text('Go back!'),
-        ),
-      ),
-    );
   }
 }
 
@@ -70,12 +29,11 @@ class Favorite extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final tiles = _RandomWordsState._saved.map(
-          (WordPair pair) {
+          (String word) {
         return ListTile(
           title: Text(
-            pair.asPascalCase,
+            word,
             style: _biggerFont,
           ),
         );
@@ -92,7 +50,6 @@ class Favorite extends StatelessWidget {
       ),
       body: ListView(children: divided),
     );
-
   }
 }
 
@@ -104,9 +61,10 @@ class RandomWords extends StatefulWidget {
 }
 
 class _RandomWordsState extends State<RandomWords> {
-  static List<WordPair> _suggestions = <WordPair>[];
-  static List<WordPair> _saved = <WordPair>[];
+  static List<String> _saved = <String>[];
   final _biggerFont = const TextStyle(fontSize: 18.0);
+
+  final items = List<String>.generate(100, (i) => "Item $i");
 
   @override
   Widget build(BuildContext context) {
@@ -120,23 +78,17 @@ class _RandomWordsState extends State<RandomWords> {
   Widget _buildSuggestions() {
     return ListView.builder(
         padding: const EdgeInsets.all(16.0),
-        itemBuilder: /*1*/ (context, i) {
-          if (i.isOdd) return const Divider();
-          /*2*/
-
-          final index = i ~/ 2; /*3*/
-          if (index >= _suggestions.length) {
-            _suggestions.addAll(generateWordPairs().take(10)); /*4*/
-          }
-          return _buildRow(_suggestions[index]);
-        });
+        itemBuilder: (context, index) {
+          return _buildRow(items[index]);
+        }
+    );
   }
 
-  Widget _buildRow(WordPair pair) {
-    final alreadySaved = _saved.contains(pair);
+  Widget _buildRow(String word) {
+    final alreadySaved = _saved.contains(word);
     return ListTile(
         title: Text(
-          pair.asPascalCase,
+          word,
           style: _biggerFont,
         ),
         trailing: Icon(
@@ -146,9 +98,9 @@ class _RandomWordsState extends State<RandomWords> {
         onTap: () {
           setState(() {
             if (alreadySaved) {
-              _saved.remove(pair);
+              _saved.remove(word);
             } else {
-              _saved.add(pair);
+              _saved.add(word);
             }
           });
         });
@@ -162,35 +114,97 @@ class NavDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
         child: ListView(
-      padding: EdgeInsets.zero,
-      children: <Widget>[
-        DrawerHeader(
-            child: Text(
-          'Menu',
-          style: TextStyle(color: Colors.white, fontSize: 25),
-        )),
-        ListTile(
-          leading: Icon(Icons.input),
-          title: Text('Home'),
-          onTap: () => {Navigator.pushNamed(context, '/')},
-        ),
-        ListTile(
-          leading: Icon(Icons.input),
-          title: Text('Second'),
-          onTap: () => {Navigator.pushNamed(context, '/second')},
-        ),
-        ListTile(
-          leading: Icon(Icons.input),
-          title: Text('Generator'),
-          onTap: () => {Navigator.pushNamed(context, '/generator')},
-        ),
-        ListTile(
-          leading: Icon(Icons.input),
-          title: Text('Favoris'),
-          onTap: () => {Navigator.pushNamed(context, '/favorite')},
-        )
-      ],
-    ));
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+                child: Text(
+                  'Menu',
+                  style: TextStyle(color: Colors.white, fontSize: 25),
+                )),
+            ListTile(
+              leading: Icon(Icons.input),
+              title: Text('Generator'),
+              onTap: () => {Navigator.pushNamed(context, '/generator')},
+            ),
+            ListTile(
+              leading: Icon(Icons.input),
+              title: Text('Favoris'),
+              onTap: () => {Navigator.pushNamed(context, '/favorite')},
+            ),
+            ListTile(
+              leading: Icon(Icons.input),
+              title: Text('Form'),
+              onTap: () => {Navigator.pushNamed(context, '/addFavorite')},
+            ),
+          ],
+        ));
   }
 }
 
+class FormFavorite extends StatefulWidget {
+  const FormFavorite({Key? key}) : super(key: key);
+
+  @override
+  _FormFavoriteState createState() => _FormFavoriteState();
+}
+
+class _FormFavoriteState extends State<FormFavorite> {
+  final _formKey = GlobalKey<FormState>();
+  var _saved = _RandomWordsState._saved;
+  final myController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      drawer: NavDrawer(),
+      appBar: AppBar(title: const Text('Startup Name Generator'), actions: []),
+      body: _myForm(),
+    );
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    myController.dispose();
+    super.dispose();
+  }
+
+  Widget _myForm() {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: <Widget>[
+          TextFormField(
+            controller: myController,
+            decoration: InputDecoration(
+                border: UnderlineInputBorder(),
+                labelText: 'Enter a name'
+            ),
+            // The validator receives the text that the user has entered.
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter some text';
+              }
+              if (_saved.contains(value)) {
+                return 'Already in favorite';
+              }
+              return null;
+            },
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // Validate returns true if the form is valid, or false otherwise.
+              if (_formKey.currentState!.validate()) {
+                // If the form is valid, display a snackbar. In the real world,
+                // you'd often call a server or save the information in a database.
+                _saved.add(myController.text);
+              }
+            },
+            child: const Text('Submit'),
+          ),
+          // Add TextFormFields and ElevatedButton here.
+        ],
+      ),
+    );
+  }
+}
