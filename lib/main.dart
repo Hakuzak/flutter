@@ -198,6 +198,9 @@ class _FormFavoriteState extends State<FormFavorite> {
                 // If the form is valid, display a snackbar. In the real world,
                 // you'd often call a server or save the information in a database.
                 _saved.add(myController.text);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Ajouté')),
+                );
               }
             },
             child: const Text('Submit'),
